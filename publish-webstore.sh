@@ -12,8 +12,8 @@
 #                                                                 #
 ###################################################################
 
-echo -e '\n\e[33mRunning publish-webstore.sh with arguments:'
-echo $@'\e[0m'
+echo -e '\n\e[33mRunning publish-webstore.sh with arguments:\e[0m'
+echo -e "$@"
 
 ###################
 # Parse arguments #
