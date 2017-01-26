@@ -85,7 +85,7 @@ manage_api_response() {
 
     #Show Webstore API response
     cat api-response.json
-    echo -en "\e[0m"
+    echo -en "\n\n\e[0m"
 
     #Exit if error
     if [[ ${EXIT_CODE} != 0 ]]; then
@@ -122,34 +122,41 @@ HTTP_CODE=$(curl \
 
 manage_api_response Upload uploadState SUCCESS
 
-###################################
-# Publish the existing store item #
-###################################
+############################################################
+# Publish the existing store item if PUBLISH_TARGET is set #
+############################################################
 
-echo -e '\n\n\e[33mPublishing Chrome Web Store item with id "'${EXTENSION_ID}'"...\n\e[0m'
+if [ -n "$PUBLISH_TARGET" ]; then
 
-# In case of 'unlisted' target, only passing 'publishTarget' as a request header works
-if [[ ${PUBLISH_TARGET} == 'unlisted' ]]; then
-    HTTP_CODE=$(curl \
-    -w %{http_code} \
-    -o api-response.json \
-    -H "Authorization: Bearer $ACCESS_TOKEN"  \
-    -H "x-goog-api-version: 2" \
-    -H "Content-Length: 0" \
-    -H "publishTarget: $PUBLISH_TARGET" \
-    -X POST \
-    -v https://www.googleapis.com/chromewebstore/v1.1/items/${EXTENSION_ID}/publish)
-# For other targets ('default' or 'trustedTesters') we must pass 'target' as request body in json format
+    echo -e '\e[33mPublishing Chrome Web Store item with id "'${EXTENSION_ID}'"...\n\e[0m'
+
+    # In case of 'unlisted' target, only passing 'publishTarget' as a request header works
+    if [[ ${PUBLISH_TARGET} == 'unlisted' ]]; then
+        HTTP_CODE=$(curl \
+        -w %{http_code} \
+        -o api-response.json \
+        -H "Authorization: Bearer $ACCESS_TOKEN"  \
+        -H "x-goog-api-version: 2" \
+        -H "Content-Length: 0" \
+        -H "publishTarget: $PUBLISH_TARGET" \
+        -X POST \
+        -v https://www.googleapis.com/chromewebstore/v1.1/items/${EXTENSION_ID}/publish)
+    # For other targets ('default' or 'trustedTesters') we must pass 'target' as request body in json format
+    else
+        HTTP_CODE=$(curl \
+        -w %{http_code} \
+        -o api-response.json \
+        -H "Authorization: Bearer $ACCESS_TOKEN" \
+        -H "x-goog-api-version: 2" \
+        -H "Content-Type: application/json" \
+        -d "{\"target\":\"$PUBLISH_TARGET\"}" \
+        -X POST \
+        -v https://www.googleapis.com/chromewebstore/v1.1/items/${EXTENSION_ID}/publish)
+    fi
+
+    manage_api_response Publish status OK
+
 else
-    HTTP_CODE=$(curl \
-    -w %{http_code} \
-    -o api-response.json \
-    -H "Authorization: Bearer $ACCESS_TOKEN" \
-    -H "x-goog-api-version: 2" \
-    -H "Content-Type: application/json" \
-    -d "{\"target\":\"$PUBLISH_TARGET\"}" \
-    -X POST \
-    -v https://www.googleapis.com/chromewebstore/v1.1/items/${EXTENSION_ID}/publish)
+    echo -e '\e[33mPublication SKIPPED as PUBLISH_TARGET (-t|--target) was'\
+        'not specified.\nItem has only been uploaded to the store (draft)\n\n\e[0m'
 fi
-
-manage_api_response Publish status OK
