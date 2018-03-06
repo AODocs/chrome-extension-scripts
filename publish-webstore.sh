@@ -103,6 +103,12 @@ echo -e '\n\e[33mGetting OAuth2 access token using existing refresh token...\n\e
 TOKEN_INFO=$(curl "https://accounts.google.com/o/oauth2/token" -d \
 "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob")
 
+if [[ ${TOKEN_INFO} =~ error ]]; then
+    echo -e '\n\e[31mGetting OAuth2 access token FAILED!'
+    echo ${TOKEN_INFO}
+    exit -1
+fi
+
 ACCESS_TOKEN=$(expr "$TOKEN_INFO" : '.*"access_token" : "\([^"]*\)"')
 
 ##################################################################
