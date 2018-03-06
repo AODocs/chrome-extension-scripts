@@ -100,8 +100,10 @@ manage_api_response() {
 
 echo -e '\n\e[33mGetting OAuth2 access token using existing refresh token...\n\e[0m'
 
-TOKEN_INFO=$(curl "https://www.googleapis.com/oauth2/v4/token" -X POST -d \
-"client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token")
+TOKEN_INFO=$(curl "https://www.googleapis.com/oauth2/v4/token" \
+    -X POST \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token")
 
 #Log & exit in case of auth error
 if [[ ${TOKEN_INFO} =~ error ]]; then
@@ -110,7 +112,7 @@ if [[ ${TOKEN_INFO} =~ error ]]; then
     exit -1
 fi
 
-ACCESS_TOKEN=$(expr "$TOKEN_INFO" : '.*"access_token" : "\([^"]*\)"')
+ACCESS_TOKEN=$(expr "$TOKEN_INFO" : '.*"access_token": "\([^"]*\)"')
 
 ##################################################################
 # Upload the extension package to update the existing store item #
