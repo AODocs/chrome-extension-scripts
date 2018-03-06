@@ -100,7 +100,7 @@ manage_api_response() {
 
 echo -e '\n\e[33mGetting OAuth2 access token using existing refresh token...\n\e[0m'
 
-TOKEN_INFO=$(curl "https://accounts.google.com/o/oauth2/v4/token" -d \
+TOKEN_INFO=$(curl "https://accounts.google.com/o/oauth2/v4/token" -X POST -d \
 "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token")
 
 #Log & exit in case of auth error
