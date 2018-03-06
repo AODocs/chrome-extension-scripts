@@ -106,7 +106,7 @@ TOKEN_INFO=$(curl "https://accounts.google.com/o/oauth2/v4/token" -d \
 #Log & exit in case of auth error
 if [[ ${TOKEN_INFO} =~ error ]]; then
     echo -e '\n\e[31mGetting OAuth2 access token FAILED!'
-    echo ${TOKEN_INFO}
+    echo -e '\n\e[31m'${TOKEN_INFO}'\n\e[0m'
     exit -1
 fi
 
