@@ -64,7 +64,7 @@ manage_api_response() {
     #2xx OK Status Code
     if [[ ${HTTP_CODE} =~ ^2[0-9]{2}$ ]]; then
 
-        STATUS=$(grep -Po '"'${EXPECTED_KEY}'":\[?"(\K[^"]*)' api-response.json)
+        STATUS=$(grep -Po '"'${EXPECTED_KEY}'":\s*\[?"(\K[^"]*)' api-response.json)
 
         #The JSON response contains the EXPECTED_KEY and EXPECTED_VALUE
         if [[ ${STATUS} == ${EXPECTED_VALUE} ]]; then
